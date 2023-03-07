@@ -3,9 +3,32 @@ package handler
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/YakovAkk/test_project_go/app/service"
+	"github.com/gin-gonic/gin"
 )
 
-func listener(w http.ResponseWriter, r *http.Request) {
+type Handler struct {
+	services *service.Service
+}
+
+func NewHandler(services *service.Service) *Handler {
+	return &Handler{services: services}
+}
+
+func (h *Handler) InitRoutes() *gin.Engine {
+	router := gin.New()
+
+	api := router.Group("/api")
+	{
+		api.POST("/", h.GetPriceByPost)
+		api.POST("/", h.GetPriceByGet)
+	}
+
+	return router
+}
+
+func (h *Handler) listener(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		http.Error(w, "404 PAGE NOT FOUND!", http.StatusNotFound)
 		return
